@@ -1,0 +1,205 @@
+/*
+  Instrução: Apague todo o conteúdo do seu arquivo `src/app/home/home.page.scss`
+  e cole este novo código.
+*/
+
+:host {
+  --ion-background-color: #f4f5f8;
+}
+
+ion-header ion-toolbar {
+  --background: var(--ion-color-primary);
+  --color: var(--ion-color-primary-contrast);
+}
+
+ion-title.ion-text-center {
+  font-weight: bold;
+}
+
+/* Estilo para os cards de status */
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 12px 8px;
+  text-align: center;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.card-title {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  margin: 0 0 8px 0;
+}
+
+.card-content {
+  font-size: clamp(0.9rem, 3.8vw, 1.3rem);
+  font-weight: 700;
+  color: var(--ion-color-primary);
+  margin: 0;
+  word-break: break-all;
+}
+
+.card-special .card-content {
+  color: var(--ion-color-tertiary);
+}
+
+.accuracy-good { color: var(--ion-color-success); }
+.accuracy-medium { color: var(--ion-color-warning); }
+.accuracy-bad { color: var(--ion-color-danger); }
+
+.status-message {
+  color: #333;
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-top: 12px;
+  height: 20px;
+}
+
+ion-item-divider {
+  --background: transparent;
+  --padding-start: 0;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+  margin-top: 16px;
+}
+
+.list-container {
+  height: 25vh;
+  overflow-y: auto;
+}
+
+ion-list {
+  background: transparent;
+  padding: 0;
+}
+
+ion-item {
+  --background: #ffffff;
+  --border-radius: 12px;
+  --inner-padding-end: 0;
+  --inner-padding-start: 0;
+  --padding-start: 0;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.07);
+  border: none;
+  color: #333;
+}
+
+.item-grid {
+  width: 100%;
+  padding: 8px 0;
+}
+
+.item-id-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #e0e0e0;
+  padding-right: 12px;
+}
+
+.item-id {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--ion-color-primary);
+}
+
+.item-details-col {
+  padding-left: 12px;
+}
+
+.item-details h2 {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #333333;
+  margin: 0 0 4px 0;
+  line-height: 1.2;
+}
+
+.item-details p {
+  font-size: 0.8rem;
+  color: #666666;
+  margin: 0;
+}
+
+.item-description {
+  font-style: italic;
+  font-size: 0.85rem;
+  color: #555;
+  padding-top: 6px;
+  border-top: 1px solid #f0f0f0;
+  margin-top: 6px;
+}
+
+.delete-btn {
+  --padding-start: 8px;
+  --padding-end: 8px;
+  height: 100%;
+}
+
+ion-footer ion-toolbar {
+  --background: #ffffff;
+  --min-height: auto;
+  padding-top: 8px;
+  padding-bottom: calc(8px + env(safe-area-inset-bottom));
+}
+
+.footer-grid {
+  padding: 0;
+}
+
+.footer-btn {
+  --border-radius: 20px !important;
+  font-size: 0.75rem;
+  margin: 0;
+}
+
+.credits-content {
+  text-align: center;
+
+  h3 {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--ion-color-primary);
+  }
+
+  p {
+    font-size: 1rem;
+    color: #444;
+    white-space: pre-wrap;
+    margin-bottom: 24px;
+  }
+
+  ion-button {
+    margin-top: 16px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :host {
+    --ion-background-color: #121212;
+  }
+
+  .card, ion-item, ion-footer ion-toolbar {
+    background: #1e1e1e;
+  }
+
+  .card-title, .item-details p, .status-message {
+    color: #adadad;
+  }
+
+  .item-details h2, ion-item-divider, .item-description {
+    color: #e0e0e0;
+  }
+  
+  .item-id-col {
+    border-right-color: #444;
+  }
+}

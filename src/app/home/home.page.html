@@ -1,0 +1,163 @@
+<!--
+  Instrução: Apague todo o conteúdo do seu arquivo `src/app/home/home.page.html`
+  e cole este novo código no lugar.
+-->
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title class="ion-text-center">
+      AIGEO GPS Dados
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <!-- Grid para os cards de status -->
+  <ion-grid>
+    <ion-row>
+      <ion-col size="6" size-md="2.4">
+        <div class="card">
+          <h2 class="card-title">Latitude</h2>
+          <p class="card-content">{{ latitude }}</p>
+        </div>
+      </ion-col>
+      <ion-col size="6" size-md="2.4">
+        <div class="card">
+          <h2 class="card-title">Longitude</h2>
+          <p class="card-content">{{ longitude }}</p>
+        </div>
+      </ion-col>
+      <ion-col size="6" size-md="2.4">
+        <div class="card">
+          <h2 class="card-title">Altitude</h2>
+          <p class="card-content">{{ altitude }}</p>
+        </div>
+      </ion-col>
+      <ion-col size="6" size-md="2.4">
+        <div class="card">
+          <h2 class="card-title">Precisão</h2>
+          <p class="card-content" [ngClass]="precisaoClass">{{ precisao }}</p>
+        </div>
+      </ion-col>
+      <ion-col size="12" size-md="2.4">
+        <div class="card card-special">
+          <h2 class="card-title">Satélites</h2>
+          <p class="card-content">{{ satellites }}</p>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <!-- Botão Principal de Coleta -->
+  <div class="ion-padding-vertical ion-text-center">
+    <ion-button size="large" shape="round" (click)="collectCurrentPoint()" [disabled]="!currentPosition">
+      <ion-icon slot="start" name="location"></ion-icon>
+      Coletar Ponto
+    </ion-button>
+    <p class="status-message">{{ statusMessage }}</p>
+  </div>
+
+  <!-- Seção de Pontos Coletados com Lista Nativa -->
+  <ion-item-divider>
+    <ion-label>
+      Pontos Coletados ({{ collectedPoints.length }})
+    </ion-label>
+  </ion-item-divider>
+  
+  <div class="list-container">
+    <ion-list>
+      <ion-item *ngFor="let point of collectedPoints">
+        <ion-grid class="item-grid" (click)="editPoint(point)">
+          <ion-row class="ion-align-items-center">
+            <ion-col size="2" class="item-id-col">
+              <div class="item-id">{{ point.id }}</div>
+            </ion-col>
+            <ion-col size="8" class="item-details-col">
+              <div class="item-details">
+                <h2>Lat: {{ point.latitude.toFixed(5) }}, Lon: {{ point.longitude.toFixed(5) }}</h2>
+                <p>Altitude: {{ point.altitude?.toFixed(1) || 'N/A' }}m | Precisão: {{ point.accuracy.toFixed(1) }}m</p>
+                <p class="item-description">{{ point.description }}</p>
+              </div>
+            </ion-col>
+            <!-- NOVO BOTÃO DE EXCLUSÃO -->
+            <ion-col size="2" class="ion-text-center">
+              <ion-button class="delete-btn" fill="clear" color="danger" (click)="deletePoint(point, $event)">
+                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-item>
+      <ion-item *ngIf="collectedPoints.length === 0" lines="none">
+        <ion-label class="ion-text-center ion-padding" color="medium">Nenhum ponto coletado.</ion-label>
+      </ion-item>
+    </ion-list>
+  </div>
+
+</ion-content>
+
+<!-- Botões de Ação na parte inferior -->
+<ion-footer>
+  <ion-toolbar>
+    <ion-grid class="footer-grid">
+      <ion-row>
+        <ion-col>
+          <ion-button class="footer-btn" color="success" fill="outline" expand="block" (click)="exportToFile('csv')" [disabled]="collectedPoints.length === 0">
+            <ion-icon slot="start" name="document-text"></ion-icon>
+            CSV
+          </ion-button>
+        </ion-col>
+        <ion-col>
+          <ion-button class="footer-btn" color="tertiary" fill="outline" expand="block" (click)="exportToFile('kml')" [disabled]="collectedPoints.length === 0">
+            <ion-icon slot="start" name="globe"></ion-icon>
+            KML
+          </ion-button>
+        </ion-col>
+        <ion-col>
+          <ion-button class="footer-btn" color="danger" fill="outline" expand="block" (click)="confirmClear()" [disabled]="collectedPoints.length === 0">
+            <ion-icon slot="start" name="trash"></ion-icon>
+            Limpar
+          </ion-button>
+        </ion-col>
+        <ion-col>
+          <ion-button class="footer-btn" color="medium" fill="outline" expand="block" (click)="showCreditsModal()">
+            <ion-icon slot="start" name="information-circle-outline"></ion-icon>
+            Info
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-toolbar>
+</ion-footer>
+
+<!-- Modal de Créditos -->
+<ion-modal #creditsModal [translucent]="true">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Créditos</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeCreditsModal()">Fechar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding">
+      <div class="credits-content">
+        <h3>Desenvolvido por AIGEO Mapas</h3>
+        <p>
+          <strong>Geógrafo da AIGEO:</strong><br>
+          Prof. M.Sc Antonio Idêrlian Pereira de Sousa
+        </p>
+        
+        <ion-button expand="block" fill="outline" (click)="openLink('http://lattes.cnpq.br/8679039748672255')">
+          <ion-icon slot="start" name="link-outline"></ion-icon>
+          Currículo Lattes
+        </ion-button>
+        
+        <ion-button expand="block" fill="outline" color="tertiary" (click)="openLink('https://www.instagram.com/aigeomapas/')">
+          <ion-icon slot="start" name="logo-instagram"></ion-icon>
+          Instagram
+        </ion-button>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>
