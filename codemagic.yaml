@@ -14,7 +14,7 @@ workflows:
           # Para o script se houver qualquer erro
           set -e
 
-          # 1. Instala as dependências do NPM (incluindo @ionic/cli e @capacitor/cli do seu package.json)
+          # 1. Instala as dependências do NPM
           echo ">>> Instalando dependências do projeto..."
           npm install
 
@@ -27,26 +27,23 @@ workflows:
           ionic build
 
           # 4. Sincroniza os ficheiros web com o projeto nativo
-          #    Este comando já executa 'add' se a plataforma não existir, tornando o passo anterior desnecessário.
           echo ">>> Sincronizando com Capacitor para iOS..."
           ionic capacitor sync ios
       
-      - name: Instalar dependências nativas (CocoaPods)
+      - name: Instalar dependências, assinar e construir o app iOS
         script: |
-          # Navega para a pasta do iOS e instala os Pods
+          # Para o script se houver qualquer erro
+          set -e
+
+          # 1. Instala as dependências nativas (CocoaPods) sem mudar de diretório
           echo ">>> Instalando dependências nativas com CocoaPods..."
-          cd ios/App && pod install
+          pod install --project-directory=ios/App
 
-      - name: Configurar assinatura de código e construir .ipa
-        script: |
-          # Cada script no Codemagic começa na raiz do projeto, então não é necessário navegar para trás.
-          
-          # Assina a aplicação usando os perfis carregados no Codemagic
+          # 2. (CORREÇÃO) Assina a aplicação especificando o projeto correto
           echo ">>> Configurando a assinatura de código..."
-          xcode-project use-profiles
+          xcode-project use-profiles --project="ios/App/App.xcodeproj"
 
-          # Constrói o ficheiro .ipa final
-          # O caminho para o workspace é relativo à raiz do projeto.
+          # 3. Constrói o ficheiro .ipa final
           echo ">>> Construindo o ficheiro .ipa..."
           xcode-project build-ipa --workspace "ios/App/App.xcworkspace" --scheme "App"
 
