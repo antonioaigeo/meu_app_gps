@@ -18,7 +18,7 @@ workflows:
           echo ">>> Instalando dependências do projeto..."
           npm install
 
-          # 2. (A CORREÇÃO) Instala o pacote da plataforma iOS do Capacitor
+          # 2. Instala o pacote da plataforma iOS do Capacitor
           echo ">>> Instalando plataforma Capacitor iOS..."
           npm install @capacitor/ios
 
@@ -39,14 +39,14 @@ workflows:
 
       - name: Configurar assinatura de código e construir .ipa
         script: |
-          # Define o diretório do projeto para os comandos seguintes
-          cd .. # Volta para a raiz do projeto (onde está a pasta 'ios')
-
+          # Cada script no Codemagic começa na raiz do projeto, então não é necessário navegar para trás.
+          
           # Assina a aplicação usando os perfis carregados no Codemagic
           echo ">>> Configurando a assinatura de código..."
           xcode-project use-profiles
 
           # Constrói o ficheiro .ipa final
+          # O caminho para o workspace é relativo à raiz do projeto.
           echo ">>> Construindo o ficheiro .ipa..."
           xcode-project build-ipa --workspace "ios/App/App.xcworkspace" --scheme "App"
 
