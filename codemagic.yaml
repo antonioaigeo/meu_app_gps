@@ -1,30 +1,40 @@
 # Ficheiro: codemagic.yaml
+# Roteiro de instruções para o Codemagic construir o app para iOS
 workflows:
   ios-app-build:
-    name: Construir App iOS
-    instance_type: mac_mini_m1
+    name: Construir App AIGEO para iOS
+    instance_type: mac_mini_m1 # Define o tipo de Mac virtual a ser usado
     environment:
-      node: 18 # Versão do Node.js
+      # CORREÇÃO: Atualizado para a versão 20 do Node.js
+      node: 20 
       xcode: 15 # Versão do Xcode
       cocoapods: default
     scripts:
-      - name: Instalar dependências
+      - name: Instalar dependências do projeto
         script: | 
           npm install
-      - name: Adicionar plataforma iOS
+      - name: Instalar bibliotecas do Ionic e Capacitor
+        script: | 
+          npm install -g @ionic/cli
+          npm install @capacitor/cli
+      - name: Construir a versão web do app
+        script: | 
+          ionic build
+      - name: Adicionar a plataforma iOS
         script: | 
           ionic capacitor add ios
-      - name: Sincronizar projeto
+      - name: Sincronizar o projeto web com o nativo
         script: | 
           ionic capacitor sync ios
-      - name: Instalar dependências do iOS (CocoaPods)
+      - name: Instalar dependências nativas do iOS (CocoaPods)
         script: | 
           cd ios/App && pod install && cd ../..
-      - name: Configurar para usar o Xcode moderno
+      - name: Configurar assinatura de código (Code Signing)
         script: | 
           xcode-project use-profiles
-      - name: Construir o aplicativo iOS
+      - name: Construir o ficheiro .ipa (o "APK" do iOS)
         script: | 
           xcode-project build-ipa --workspace "ios/App/App.xcworkspace" --scheme "App"
     artifacts:
+      # Onde encontrar o ficheiro final para download
       - build/ios/ipa/*.ipa
