@@ -1,73 +1,55 @@
 # Ficheiro: codemagic.yaml
-# Roteiro de instruções para o Codemagic construir o app para iOS
+# Roteiro de instruções para o Codemagic construir o app para iOS (versão corrigida e otimizada)
 workflows:
   ios-app-build:
     name: Construir App AIGEO para iOS
     instance_type: mac_mini_m1 # Define o tipo de Mac virtual a ser usado
     environment:
-      # CORREÇÃO: Atualizado para a versão 20 do Node.js
-      node: 20 
-      xcode: 15 # Versão do Xcode
+      node: 20
+      xcode: 15
       cocoapods: default
     scripts:
-      - name: Instalar dependências do projeto
+      - name: Instalar, construir e sincronizar o projeto
         script: | 
+          # Para o script se houver qualquer erro
+          set -e
+
+          # 1. Instala as dependências do NPM (incluindo @ionic/cli e @capacitor/cli do seu package.json)
+          echo ">>> Instalando dependências do projeto..."
           npm install
-      - name: Instalar bibliotecas do Ionic e Capacitor
-        script: | 
-          npm install -g @ionic/cli
-          npm install @capacitor/cli
-      - name: Construir a versão web do app
-        script: | 
+
+          # 2. (A CORREÇÃO) Instala o pacote da plataforma iOS do Capacitor
+          echo ">>> Instalando plataforma Capacitor iOS..."
+          npm install @capacitor/ios
+
+          # 3. Constrói a versão web do app
+          echo ">>> Compilando a aplicação web com Ionic..."
           ionic build
-      - name: Adicionar a plataforma iOS
-        script: | 
-          ionic capacitor add ios
-      - name: Sincronizar o projeto web com o nativo
-        script: | 
+
+          # 4. Sincroniza os ficheiros web com o projeto nativo
+          #    Este comando já executa 'add' se a plataforma não existir, tornando o passo anterior desnecessário.
+          echo ">>> Sincronizando com Capacitor para iOS..."
           ionic capacitor sync ios
-      - name: Instalar dependências nativas do iOS (CocoaPods)
-        script: | 
-          cd ios/App && pod install && cd ../..
-      - name: Configurar assinatura de código (Code Signing)
-        script: | 
+      
+      - name: Instalar dependências nativas (CocoaPods)
+        script: |
+          # Navega para a pasta do iOS e instala os Pods
+          echo ">>> Instalando dependências nativas com CocoaPods..."
+          cd ios/App && pod install
+
+      - name: Configurar assinatura de código e construir .ipa
+        script: |
+          # Define o diretório do projeto para os comandos seguintes
+          cd .. # Volta para a raiz do projeto (onde está a pasta 'ios')
+
+          # Assina a aplicação usando os perfis carregados no Codemagic
+          echo ">>> Configurando a assinatura de código..."
           xcode-project use-profiles
-      - name: Construir o ficheiro .ipa (o "APK" do iOS)
-        script: | 
+
+          # Constrói o ficheiro .ipa final
+          echo ">>> Construindo o ficheiro .ipa..."
           xcode-project build-ipa --workspace "ios/App/App.xcworkspace" --scheme "App"
-          scripts:
-    - name: Instalar dependências e configurar iOS
-      script: | 
-        # Para o script se houver qualquer erro
-        set -e
 
-        # 1. Instala as dependências definidas no package.json
-        echo ">>> Instalando dependências do NPM..."
-        npm install
-
-        # 2. Instala o pacote da plataforma iOS do Capacitor (A CORREÇÃO)
-        echo ">>> Instalando plataforma Capacitor iOS..."
-        npm install @capacitor/ios
-
-        # 3. Executa o build do seu projeto web (Vue, React, Angular, etc.)
-        #    Atenção: Se o seu comando for diferente de "npm run build", ajuste a linha abaixo.
-        echo ">>> Compilando o projeto web..."
-        npm run build
-
-        # 4. Sincroniza os arquivos web com o projeto nativo do iOS
-        #    Este comando também executa 'npx cap add ios' se a pasta 'ios' não existir.
-        echo ">>> Sincronizando com o Capacitor..."
-        npx cap sync ios
-
-        # 5. Instala as dependências nativas do iOS (CocoaPods)
-        echo ">>> Instalando pods do iOS..."
-        cd ios/App && pod install
-
-    - name: Build do app iOS
-      script: | 
-        # Script para compilar o app com Xcode
-        # Ajuste o nome do scheme se o seu for diferente de 'App'
-        xcode-project build-ipa --workspace "ios/App/App.xcworkspace" --scheme "App"
     artifacts:
       # Onde encontrar o ficheiro final para download
       - build/ios/ipa/*.ipa
