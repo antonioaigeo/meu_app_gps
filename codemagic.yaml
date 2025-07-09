@@ -1,0 +1,30 @@
+# Ficheiro: codemagic.yaml
+workflows:
+  ios-app-build:
+    name: Construir App iOS
+    instance_type: mac_mini_m1
+    environment:
+      node: 18 # Versão do Node.js
+      xcode: 15 # Versão do Xcode
+      cocoapods: default
+    scripts:
+      - name: Instalar dependências
+        script: | 
+          npm install
+      - name: Adicionar plataforma iOS
+        script: | 
+          ionic capacitor add ios
+      - name: Sincronizar projeto
+        script: | 
+          ionic capacitor sync ios
+      - name: Instalar dependências do iOS (CocoaPods)
+        script: | 
+          cd ios/App && pod install && cd ../..
+      - name: Configurar para usar o Xcode moderno
+        script: | 
+          xcode-project use-profiles
+      - name: Construir o aplicativo iOS
+        script: | 
+          xcode-project build-ipa --workspace "ios/App/App.xcworkspace" --scheme "App"
+    artifacts:
+      - build/ios/ipa/*.ipa
