@@ -35,6 +35,39 @@ workflows:
       - name: Construir o ficheiro .ipa (o "APK" do iOS)
         script: | 
           xcode-project build-ipa --workspace "ios/App/App.xcworkspace" --scheme "App"
+          scripts:
+    - name: Instalar dependências e configurar iOS
+      script: | 
+        # Para o script se houver qualquer erro
+        set -e
+
+        # 1. Instala as dependências definidas no package.json
+        echo ">>> Instalando dependências do NPM..."
+        npm install
+
+        # 2. Instala o pacote da plataforma iOS do Capacitor (A CORREÇÃO)
+        echo ">>> Instalando plataforma Capacitor iOS..."
+        npm install @capacitor/ios
+
+        # 3. Executa o build do seu projeto web (Vue, React, Angular, etc.)
+        #    Atenção: Se o seu comando for diferente de "npm run build", ajuste a linha abaixo.
+        echo ">>> Compilando o projeto web..."
+        npm run build
+
+        # 4. Sincroniza os arquivos web com o projeto nativo do iOS
+        #    Este comando também executa 'npx cap add ios' se a pasta 'ios' não existir.
+        echo ">>> Sincronizando com o Capacitor..."
+        npx cap sync ios
+
+        # 5. Instala as dependências nativas do iOS (CocoaPods)
+        echo ">>> Instalando pods do iOS..."
+        cd ios/App && pod install
+
+    - name: Build do app iOS
+      script: | 
+        # Script para compilar o app com Xcode
+        # Ajuste o nome do scheme se o seu for diferente de 'App'
+        xcode-project build-ipa --workspace "ios/App/App.xcworkspace" --scheme "App"
     artifacts:
       # Onde encontrar o ficheiro final para download
       - build/ios/ipa/*.ipa
